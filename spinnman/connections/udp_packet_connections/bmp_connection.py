@@ -14,13 +14,16 @@
 
 import struct
 from typing import Optional, Sequence, Tuple
+
 from spinn_utilities.overrides import overrides
-from .udp_connection import UDPConnection
+
 from spinnman.constants import SCP_SCAMP_PORT
 from spinnman.messages.scp.enums import SCPResult
 from spinnman.messages.scp.abstract_messages import AbstractSCPRequest
 from spinnman.connections.abstract_classes import AbstractSCPConnection
 from spinnman.model import BMPConnectionData
+
+from .udp_connection import UDPConnection
 
 _TWO_SHORTS = struct.Struct("<2H")
 _TWO_SKIP = struct.Struct("<2x")
@@ -79,10 +82,6 @@ class BMPConnection(UDPConnection, AbstractSCPConnection):
         data = self.receive(timeout)
         result, sequence = _TWO_SHORTS.unpack_from(data, 10)
         return SCPResult(result), sequence, data, 2
-
-    @overrides(AbstractSCPConnection.send_scp_request)
-    def send_scp_request(self, scp_request: AbstractSCPRequest):
-        self.send(self.get_scp_data(scp_request))
 
     def __repr__(self):
         return (
